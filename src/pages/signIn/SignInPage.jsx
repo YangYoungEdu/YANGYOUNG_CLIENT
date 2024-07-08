@@ -3,10 +3,14 @@ import styled from "styled-components";
 import { DefaultDiv, RowDiv } from "../../style/CommonStyle";
 import { ReactComponent as Reset } from "../../assets/Reset.svg";
 import { signInAPI } from "../../api/AuthAPI";
+import { useSetRecoilState } from "recoil";
+import { userState, jwtTokenState } from "../../Atom";
 
 const SignInPage = () => {
   const [userId, setUserId] = useState("");
   const [userPw, setUserPw] = useState("");
+  const setUser = useSetRecoilState(userState);
+  const setJWTToken = useSetRecoilState(jwtTokenState);
 
   const isButtonDisabled = userId === "" || userPw === "";
 
@@ -14,6 +18,16 @@ const SignInPage = () => {
     try {
       const response = await signInAPI(userId, userPw);
       console.log(response);
+      const userData = {
+        id: response.data.id,
+        name: response.data.name,
+      };
+      setUser(userData);
+      const jwtData = {
+        accessToken: response.data.accessToken,
+        refreshToken: response.data.refreshToken,
+      };
+      setJWTToken(jwtData);
     } catch (error) {
       console.error(error);
     }
